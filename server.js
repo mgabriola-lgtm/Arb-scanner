@@ -250,4 +250,5 @@ function toggleAuto(){
 function showErr(msg){const el=document.getElementById('err');el.textContent='⚠ '+msg;el.style.display='block'}
 </script>
 </body>
-</html>\`;
+</html>};
+
