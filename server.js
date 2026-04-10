@@ -9,7 +9,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/odds', async (req, res) => {
   const { apiKey, sport } = req.query;
   if (!apiKey || !sport) return res.status(400).json({ error: 'Missing params' });
-  const url = `https://api.the-odds-api.com/v4/sports/${sport}/odds/?apiKey=${apiKey}&regions=us&markets=h2h&oddsFormat=american&bookmakers=fanduel,pinnacle`;
+  const url = `https://api.the-odds-api.com/v4/sports/${sport}/odds/?apiKey=${apiKey}&regions=us&markets=h2h&oddsFormat=american&bookmakers=fanduel,pinnacle,draftkings,bet365
+`;
   try {
     const r = await fetch(url);
     const data = await r.json();
