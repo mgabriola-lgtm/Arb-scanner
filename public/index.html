@@ -171,9 +171,31 @@ async function scan(){
 function processGames(games,stake){
   allArbs=[];let markets=0;
   for(const g of games){
-    const fd=g.bookmakers?.find(b=>b.key==='fanduel');
-    const pin=g.bookmakers?.find(b=>b.key==='pinnacle');
-    if(!fd||!pin)continue;
+    const books=g.bookmakers||[];
+if(books.length<2)continue;
+let bestArb=null;
+for(let i=0;i<books.length;i++){
+  for(let j=i+1;j<books.length;j++){
+    const b1=books[i],b2=books[j];
+    const h1=b1.markets?.find(m=>m.key==='h2h');
+    const h2=b2.markets?.find(m=>m.key==='h2h');
+    if(!h1||!h2)continue;
+    for(const o1 of h1.outcomes){
+      const o2=h2.outcomes.find(o=>o.name!==o1.name);
+      if(!o2)continue;
+      const d1=dec(o1.price),d2=dec(o2.price),imp=1/d1+1/d2;
+      if(imp<1){
+        const margin=(1-imp)*100;
+        if(!bestArb||margin>bestArb.margin){
+          const s1=stake*(1/d1)/imp,s2=stake*(1/d2)/imp,payout=s1*d1;
+          bestArb={id:g.id+'_'+o1.name,event:g.home_team+' vs '+g.away_team,sport:g.sport_key,time:g.commence_time,margin,fdPick:o1.name,fdOdds:o1.price,pinPick:o2.name,pinOdds:o2.price,book1:b1.title,book2:b2.title,s1,s2,payout,profit:payout-stake};
+        }
+      }
+    }
+  }
+}
+if(bestArb)allArbs.push(bestArb);
+
     const fH=fd.markets?.find(m=>m.key==='h2h');
     const pH=pin.markets?.find(m=>m.key==='h2h');
     if(!fH||!pH)continue;
